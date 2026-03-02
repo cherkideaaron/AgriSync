@@ -6,7 +6,9 @@ import { Footer } from '../components/footer';
 import { ProductCard } from '../components/product-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, SlidersHorizontal, ArrowLeft, ShoppingBag } from 'lucide-react';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 const SAMPLE_PRODUCTS = [
   {
@@ -16,7 +18,7 @@ const SAMPLE_PRODUCTS = [
     price: 45,
     rating: 4.8,
     reviews: 234,
-    image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?q=80&w=800&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1663025293688-322e16b6cb66?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     id: '2',
@@ -25,7 +27,7 @@ const SAMPLE_PRODUCTS = [
     price: 89,
     rating: 4.6,
     reviews: 156,
-    image: 'https://images.unsplash.com/photo-1463123081488-789f99849c48?q=80&w=800&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1641568159866-2321c4a8fe59?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     id: '3',
@@ -61,7 +63,7 @@ const SAMPLE_PRODUCTS = [
     price: 34,
     rating: 4.4,
     reviews: 67,
-    image: 'https://images.unsplash.com/photo-1628114251105-01e40a049d56?q=80&w=800&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1592982537447-6f2a6a0c7c18?q=80&w=800&auto=format&fit=crop',
   },
   {
     id: '7',
@@ -70,7 +72,7 @@ const SAMPLE_PRODUCTS = [
     price: 78,
     rating: 4.6,
     reviews: 145,
-    image: 'https://images.unsplash.com/photo-1621287413661-30ac97f394f4?q=80&w=800&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1585914966084-71f0c43f3053?q=80&w=800&auto=format&fit=crop',
   },
   {
     id: '8',
@@ -79,7 +81,7 @@ const SAMPLE_PRODUCTS = [
     price: 65,
     rating: 4.7,
     reviews: 203,
-    image: 'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?q=80&w=800&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1628114241854-d13492582736?q=80&w=800&auto=format&fit=crop',
   },
 ];
 
@@ -96,76 +98,116 @@ export default function MarketplacePage() {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#fcfdf2] font-sans selection:bg-primary/30">
       <Navbar />
 
-      {/* Header Section */}
-      <section className="py-12 md:py-16 bg-primary/5 border-b border-border">
-        <div className="mx-auto max-w-6xl px-4 md:px-6">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-            Agricultural Marketplace
+      {/* Stunning Hero Section */}
+      <section className="relative pt-32 pb-24 overflow-hidden bg-primary shadow-[inset_0_-100px_100px_-50px_rgba(34,197,94,0.3)]">
+        <div className="absolute inset-x-0 bottom-0 top-0 opacity-15 mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+        <div className="absolute top-[-10%] right-[-10%] h-96 w-96 bg-accent opacity-20 blur-[120px] rounded-full animate-pulse" />
+        <div className="absolute bottom-[-10%] left-[-10%] h-80 w-80 bg-white opacity-10 blur-[100px] rounded-full" />
+
+        <div className="mx-auto max-w-7xl px-6 relative z-10 text-center">
+          <Link href="/farmer-dashboard" className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-8 transition-colors group">
+            <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+            <span className="text-xs font-black uppercase tracking-widest">Back to Dashboard</span>
+          </Link>
+          <h1 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter leading-none">
+            AGRICULTURAL<br /><span className="text-accent underline decoration-8 decoration-accent/30 underline-offset-8">MARKETPLACE</span>
           </h1>
-          <p className="text-muted-foreground mb-8 max-w-2xl">
-            Browse and purchase seeds, fertilizers, equipment, and supplies from trusted suppliers
+          <p className="text-white/80 mb-12 max-w-2xl mx-auto text-lg md:text-xl font-medium leading-relaxed">
+            Direct access to premium verified agricultural supplies, precision seeds, and high-performance IOT equipment.
           </p>
 
-          {/* Search Bar */}
-          <div className="flex gap-2">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <div className="max-w-3xl mx-auto flex flex-col md:flex-row gap-4">
+            <div className="flex-1 relative group">
+              <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/50 group-hover:text-white transition-colors" />
               <Input
                 type="text"
-                placeholder="Search products..."
+                placeholder="What do your crops need today?"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 w-full"
+                className="h-16 pl-14 bg-white/10 backdrop-blur-xl border-white/20 text-white placeholder:text-white/40 rounded-2xl focus:ring-accent focus:border-accent text-lg font-bold"
               />
             </div>
+            <Button className="h-16 px-10 bg-accent text-white font-black uppercase tracking-widest rounded-2xl hover:bg-white hover:text-primary transition-all shadow-2xl shadow-accent/30">
+              Search Catalog
+            </Button>
           </div>
         </div>
       </section>
 
-      {/* Main Content */}
-      <div className="flex flex-col md:flex-row gap-6 md:gap-8 py-8 md:py-12">
-        <div className="mx-auto max-w-6xl px-4 md:px-6 w-full">
-          {/* Sidebar Categories */}
-          <div className="mb-8 md:mb-0 md:col-span-1">
-            <h2 className="font-semibold text-foreground mb-4">Categories</h2>
-            <div className="flex flex-wrap gap-2 md:flex-col md:gap-2">
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  variant={selectedCategory === category ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedCategory(category)}
-                  className={
-                    selectedCategory === category
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-foreground border-border'
-                  }
-                >
-                  {category}
-                </Button>
-              ))}
+      {/* Main Catalog View */}
+      <div className="mx-auto max-w-7xl px-6 py-16">
+        <div className="flex flex-col lg:flex-row gap-12">
+          {/* Sidebar / Filters */}
+          <aside className="w-full lg:w-72 space-y-12 h-fit lg:sticky lg:top-32">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-black text-foreground uppercase tracking-widest">Categories</h2>
+                <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <div className="flex flex-wrap lg:flex-col gap-2">
+                {categories.map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => setSelectedCategory(category)}
+                    className={cn(
+                      "px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest border transition-all text-left",
+                      selectedCategory === category
+                        ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105"
+                        : "bg-white text-muted-foreground border-border hover:border-primary/50 hover:text-primary"
+                    )}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Products Grid */}
-          <div>
-            <div className="mb-6">
-              <p className="text-sm text-muted-foreground">
-                Showing {filteredProducts.length} products
-              </p>
+            <div className="p-6 bg-accent/5 rounded-3xl border border-accent/10 relative overflow-hidden group">
+              <div className="absolute top-[-20px] right-[-20px] opacity-10 group-hover:rotate-12 transition-transform duration-700">
+                <ShoppingBag className="h-32 w-32 text-accent" />
+              </div>
+              <h3 className="text-sm font-black text-foreground uppercase tracking-widest mb-2 relative z-10">Bulk Order Discount</h3>
+              <p className="text-xs text-muted-foreground mb-4 relative z-10 font-bold">15% off all seed orders over $500 this week!</p>
+              <Button size="sm" variant="outline" className="border-accent text-accent hover:bg-accent hover:text-white font-black uppercase tracking-widest text-[9px] relative z-10">Learn More</Button>
             </div>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          </aside>
+
+          {/* Product Grid Container */}
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-10 pb-6 border-b border-border/50">
+              <div>
+                <h2 className="text-2xl font-black text-foreground tracking-tighter uppercase">{selectedCategory} Catalog</h2>
+                <p className="text-xs font-bold text-muted-foreground mt-1">Found {filteredProducts.length} Premium Products</p>
+              </div>
+              <div className="flex items-center gap-4">
+                <select className="bg-transparent text-xs font-black uppercase tracking-widest text-muted-foreground border-none focus:ring-0 cursor-pointer">
+                  <option>Newest Arrivals</option>
+                  <option>Price: Low to High</option>
+                  <option>Price: High to Low</option>
+                  <option>Highest Rated</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid gap-8 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
               {filteredProducts.map((product) => (
                 <ProductCard key={product.id} {...product} />
               ))}
             </div>
 
             {filteredProducts.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No products found matching your criteria</p>
+              <div className="text-center py-32 bg-white rounded-[3rem] border-2 border-dashed border-border flex flex-col items-center gap-6 shadow-sm">
+                <div className="p-6 bg-muted rounded-full">
+                  <Search className="h-12 w-12 text-muted-foreground opacity-30" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-foreground uppercase tracking-tight">No products detected</h3>
+                  <p className="text-muted-foreground font-bold mt-2">Adjust your filters or search keywords to find what you need.</p>
+                </div>
+                <Button onClick={() => { setSearchQuery(''); setSelectedCategory('All'); }} variant="outline" className="font-black uppercase tracking-widest text-xs px-10 border-2">Reset Browsing</Button>
               </div>
             )}
           </div>

@@ -3,63 +3,41 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { StatCard } from '../components/stat-card';
-import { SidebarNav } from '../components/sidebar-nav';
-import { Leaf, BarChart3, Droplet, TrendingUp, LogOut, Menu, X } from 'lucide-react';
-import Link from 'next/link';
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts';
+import { Leaf, BarChart3, Droplet, TrendingUp, LogOut, Menu, X, CloudSun, Package, ClipboardList } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { OverviewSection } from './components/overview-section';
+import { SoilSection } from './components/soil-section';
+import { YieldSection } from './components/yield-section';
+import { WeatherSection } from './components/weather-section';
+import { InventorySection } from './components/inventory-section';
+import { TasksSection } from './components/tasks-section';
 
-const SOIL_DATA = [
-  { day: 'Mon', moisture: 65, temp: 22 },
-  { day: 'Tue', moisture: 68, temp: 23 },
-  { day: 'Wed', moisture: 72, temp: 24 },
-  { day: 'Thu', moisture: 70, temp: 22 },
-  { day: 'Fri', moisture: 75, temp: 25 },
-  { day: 'Sat', moisture: 78, temp: 26 },
-  { day: 'Sun', moisture: 76, temp: 25 },
-];
-
-const YIELD_DATA = [
-  { month: 'Jan', wheat: 2400, corn: 2210 },
-  { month: 'Feb', wheat: 2210, corn: 2290 },
-  { month: 'Mar', wheat: 2290, corn: 2000 },
-  { month: 'Apr', wheat: 2000, corn: 2181 },
-  { month: 'May', wheat: 2181, corn: 2500 },
-  { month: 'Jun', wheat: 2500, corn: 2100 },
-];
+type FarmerTab = 'overview' | 'soil' | 'yield' | 'weather' | 'inventory' | 'tasks';
 
 const SIDEBAR_ITEMS = [
-  { label: 'Overview', href: '/farmer-dashboard', icon: BarChart3 },
-  { label: 'Soil Monitoring', href: '#soil', icon: Droplet },
-  { label: 'Yield Prediction', href: '#yield', icon: TrendingUp },
+  { label: 'Overview', id: 'overview' as FarmerTab, icon: BarChart3 },
+  { label: 'Soil Monitoring', id: 'soil' as FarmerTab, icon: Droplet },
+  { label: 'Yield Prediction', id: 'yield' as FarmerTab, icon: TrendingUp },
+  { label: 'Weather', id: 'weather' as FarmerTab, icon: CloudSun },
+  { label: 'Inventory', id: 'inventory' as FarmerTab, icon: Package },
+  { label: 'Daily Tasks', id: 'tasks' as FarmerTab, icon: ClipboardList },
 ];
 
 export default function FarmerDashboard() {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [userName, setUserName] = useState('Farmer');
+  const [activeTab, setActiveTab] = useState<FarmerTab>('overview');
+  const [userName, setUserName] = useState('Aaron');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const name = localStorage.getItem('userName');
+    const name = localStorage.getItem('userName') || 'Aaron';
     const role = localStorage.getItem('userRole');
 
     if (!role || role !== 'farmer') {
       router.push('/login');
-    } else if (name) {
+    } else {
       setUserName(name);
     }
   }, [router]);
@@ -72,173 +50,120 @@ export default function FarmerDashboard() {
 
   if (!mounted) return null;
 
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'overview': return <OverviewSection />;
+      case 'soil': return <SoilSection />;
+      case 'yield': return <YieldSection />;
+      case 'weather': return <WeatherSection />;
+      case 'inventory': return <InventorySection />;
+      case 'tasks': return <TasksSection />;
+      default: return <OverviewSection />;
+    }
+  };
+
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-background">
+    <div className="flex flex-col md:flex-row h-screen bg-background overflow-hidden font-sans">
       {/* Mobile Menu Button */}
-      <div className="md:hidden flex items-center justify-between p-4 border-b border-border">
+      <div className="md:hidden flex items-center justify-between p-4 border-b border-border bg-card z-50">
         <div className="flex items-center gap-2">
           <Leaf className="h-6 w-6 text-primary" />
           <span className="font-bold text-foreground">AgriSync</span>
         </div>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="text-foreground"
+          className="text-foreground p-2 hover:bg-muted rounded-md"
         >
           {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
-      {/* Sidebar */}
-      <div
-        className={`fixed inset-0 md:static md:w-64 bg-sidebar border-r border-sidebar-border z-40 transition-transform ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-        }`}
-      >
-        <div className="hidden md:flex items-center gap-2 p-6 border-b border-sidebar-border">
-          <Leaf className="h-6 w-6 text-sidebar-primary" />
-          <span className="font-bold text-sidebar-foreground">AgriSync</span>
-        </div>
-        <div className="p-6">
-          <SidebarNav
-            items={SIDEBAR_ITEMS}
-            onNavigate={() => setSidebarOpen(false)}
-          />
-        </div>
-        <div className="absolute bottom-6 left-6 right-6">
-          <Button
-            onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 bg-destructive text-destructive-foreground hover:bg-destructive/90"
-          >
-            <LogOut className="h-4 w-4" />
-            Logout
-          </Button>
-        </div>
-      </div>
-
-      {/* Close sidebar on overlay click */}
+      {/* Sidebar Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 md:hidden bg-black/50 z-30"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-auto">
-        {/* Header */}
-        <div className="hidden md:flex items-center justify-between bg-card border-b border-border p-6">
-          <h1 className="text-2xl font-bold text-foreground">Welcome, {userName}</h1>
-          <p className="text-muted-foreground">Farm Dashboard Overview</p>
+      {/* Sidebar */}
+      <div
+        className={cn(
+          "fixed inset-y-0 left-0 w-64 bg-sidebar border-r border-sidebar-border z-50 transition-transform duration-300 md:relative md:translate-x-0",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <div className="flex flex-col h-full">
+          <div className="hidden md:flex items-center gap-2 p-6 mb-8 border-b border-sidebar-border">
+            <Leaf className="h-8 w-8 text-primary" />
+            <span className="font-black text-2xl tracking-tighter text-sidebar-foreground">AgriSync</span>
+          </div>
+
+          <nav className="flex-1 px-4 space-y-2">
+            {SIDEBAR_ITEMS.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveTab(item.id);
+                    setSidebarOpen(false);
+                  }}
+                  className={cn(
+                    "w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-200 group text-left",
+                    isActive
+                      ? "bg-primary text-primary-foreground shadow-xl shadow-primary/20 scale-[1.02]"
+                      : "text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  )}
+                >
+                  <Icon className={cn("h-5 w-5", isActive ? "animate-pulse" : "group-hover:rotate-12 transition-transform")} />
+                  <span className="font-bold text-sm">{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+
+          <div className="p-4 border-t border-sidebar-border">
+            <Button
+              onClick={handleLogout}
+              variant="ghost"
+              className="w-full flex items-center justify-center gap-2 rounded-2xl py-6 text-destructive hover:bg-destructive/10 hover:text-destructive font-bold"
+            >
+              <LogOut className="h-5 w-5" />
+              Logout
+            </Button>
+          </div>
         </div>
+      </div>
 
-        {/* Content */}
-        <div className="p-4 md:p-8 space-y-8">
-          {/* Stats Grid */}
-          <div className="grid gap-6 md:grid-cols-4">
-            <StatCard
-              label="Total Yield (tons)"
-              value="485"
-              change="+12% from last year"
-              trend="up"
-              icon={TrendingUp}
-            />
-            <StatCard
-              label="Avg Soil Moisture"
-              value="72%"
-              change="Optimal range"
-              trend="neutral"
-              icon={Droplet}
-            />
-            <StatCard
-              label="Farm Area"
-              value="150 acres"
-              change="3 active fields"
-              trend="neutral"
-            />
-            <StatCard
-              label="Market Value"
-              value="$48.5K"
-              change="+8% this month"
-              trend="up"
-            />
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#f8fafc]/50">
+        {/* Desktop Header */}
+        <header className="hidden md:flex items-center justify-between px-10 py-6 bg-transparent z-10">
+          <div>
+            <h1 className="text-3xl font-black text-foreground tracking-tight capitalize">{activeTab.replace('-', ' ')}</h1>
+            <p className="text-sm text-muted-foreground font-medium">Monitoring your agricultural ecosystem</p>
           </div>
-
-          {/* Charts Section */}
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* Soil Monitoring Chart */}
-            <Card className="p-6 bg-card">
-              <h2 className="text-lg font-semibold text-foreground mb-4">Soil Monitoring (7-Day)</h2>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={SOIL_DATA}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                  <XAxis stroke="var(--muted-foreground)" />
-                  <YAxis stroke="var(--muted-foreground)" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'var(--card)',
-                      border: '1px solid var(--border)',
-                      color: 'var(--foreground)',
-                    }}
-                  />
-                  <Legend wrapperStyle={{ color: 'var(--foreground)' }} />
-                  <Line
-                    type="monotone"
-                    dataKey="moisture"
-                    stroke="var(--chart-1)"
-                    name="Moisture %"
-                    strokeWidth={2}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="temp"
-                    stroke="var(--chart-2)"
-                    name="Temp °C"
-                    strokeWidth={2}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </Card>
-
-            {/* Yield Prediction Chart */}
-            <Card className="p-6 bg-card">
-              <h2 className="text-lg font-semibold text-foreground mb-4">Crop Yield (6-Month)</h2>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={YIELD_DATA}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                  <XAxis stroke="var(--muted-foreground)" />
-                  <YAxis stroke="var(--muted-foreground)" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'var(--card)',
-                      border: '1px solid var(--border)',
-                      color: 'var(--foreground)',
-                    }}
-                  />
-                  <Legend wrapperStyle={{ color: 'var(--foreground)' }} />
-                  <Bar dataKey="wheat" fill="var(--chart-1)" name="Wheat" />
-                  <Bar dataKey="corn" fill="var(--chart-3)" name="Corn" />
-                </BarChart>
-              </ResponsiveContainer>
-            </Card>
-          </div>
-
-          {/* Quick Actions */}
-          <Card className="p-6 bg-card">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
-            <div className="grid gap-4 md:grid-cols-3">
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-                Add New Field
-              </Button>
-              <Button variant="outline">Schedule Irrigation</Button>
-              <Link href="/marketplace">
-                <Button variant="outline" className="w-full">
-                  Browse Marketplace
-                </Button>
-              </Link>
+          <div className="flex items-center gap-4 bg-white p-2 pr-6 rounded-full shadow-sm border border-border">
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-black">
+              {userName.charAt(0)}
             </div>
-          </Card>
-        </div>
+            <div>
+              <p className="text-sm font-black text-foreground">{userName}</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Premium Farmer</p>
+            </div>
+          </div>
+        </header>
+
+        {/* Dynamic Content */}
+        <main className="flex-1 overflow-y-auto px-4 md:px-10 pb-12 scroll-smooth">
+          <div className="max-w-[1400px] mx-auto">
+            {renderContent()}
+          </div>
+        </main>
       </div>
     </div>
   );
 }
+

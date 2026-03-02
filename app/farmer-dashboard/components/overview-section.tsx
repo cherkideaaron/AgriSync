@@ -81,10 +81,11 @@ export function OverviewSection() {
                     trend="down"
                 />
                 <StatCard
-                    label="Farm Health"
-                    value="Great"
-                    change="No pests detected"
-                    trend="up"
+                    label="Estimated Harvest"
+                    value="12 Days"
+                    change="Maize Sector A"
+                    trend="neutral"
+                    icon={Clock}
                 />
             </div>
 
